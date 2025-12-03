@@ -18,7 +18,9 @@ FROM eclipse-temurin:11
 WORKDIR /app
 
 COPY target/*.jar app.jar
+ADD src/main/resources .
+COPY scripts/run.sh run.sh
 
-EXPOSE 8080
+EXPOSE 8090
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT [ "sh", "run.sh"]
