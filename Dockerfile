@@ -1,9 +1,9 @@
 # Stage 1: Build the Spring Boot application (Maven example)
-FROM maven:3.8.6-eclipse-temurin-11 AS build
-WORKDIR /app
-COPY pom.xml .
-COPY src ./src
-RUN mvn clean package -DskipTests
+#FROM maven:3.8.6-eclipse-temurin-11 AS build
+#WORKDIR /app
+#COPY pom.xml .
+#COPY src ./src
+#RUN mvn clean package -DskipTests
 
 # Stage 2: Create the final Docker image
 FROM eclipse-temurin:17-jre
