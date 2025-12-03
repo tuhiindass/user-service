@@ -1,26 +1,26 @@
-# Stage 1: Build the Spring Boot application (Maven example)
-#FROM maven:3.8.6-eclipse-temurin-11 AS build
-#WORKDIR /app
-#COPY pom.xml .
-#COPY src ./src
-#RUN mvn clean package -DskipTests
-
-# Stage 2: Create the final Docker image
-#FROM eclipse-temurin:17-jre
-#WORKDIR /app
-#COPY --from=build /app/target/*.jar app.jar
-#EXPOSE 8000
-#ENTRYPOINT ["java", "-jar", "app.jar"]
-
-
-FROM eclipse-temurin:11
-
+# Stage 1: Build the Spring Boot application (Maven)
+FROM maven:3.8.7-eclipse-temurin-17 AS build
 WORKDIR /app
 
-COPY target/*.jar app.jar
-ADD src/main/resources .
-COPY scripts/run.sh run.sh
+# Copy only pom first for caching
+COPY pom.xml .
+RUN mvn -B dependency:resolve dependency:resolve-plugins
 
-EXPOSE 8090
+# Copy source code
+COPY src ./src
 
-ENTRYPOINT [ "sh", "run.sh"]
+# Build application
+RUN mvn clean package -DskipTests
+
+
+# Stage 2: Create the final runtime Docker image
+# ❌ Avoid openjdk:17-jdk-alpine (causes SSL/musl issues)
+# ✔ Use Eclipse Temurin JRE
+FROM eclipse-temurin:17-jre
+WORKDIR /app
+
+COPY --from=build /app/target/*.jar app.jar
+
+EXPOSE 8080
+
+ENTRYPOINT ["java", "-jar", "app.jar"]
